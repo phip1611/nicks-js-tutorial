@@ -89,7 +89,7 @@
             const MILLISEKUNDEN = 1000 / AKTIONEN_PRO_SEKUNDE;
             // starten ein Interval. Diese Funktion wird einmal pro Sekunde
             // aufgerufen. Die 1000 steht für 1000ms (Millisekunden) = 1s.
-            const interval = window.setInterval(() => {
+            const interval = window.setInterval(function() {
 
                 // aktualisiere Spielerposition
                 // die alte Spielerposition wird wieder leer
@@ -217,21 +217,29 @@
 
         // Konfiguriert den "Eventlistener" (Ereignislauscher) für Tastatureingaben.
         function konfiguriereNutzereingabeTastatur(spielerRichtung) {
-            window.addEventListener('keypress', (event) => {
-                if (event.key === "w") {
-                    console.log("Richtung ist nun HOCH");
-                    spielerRichtung.richtung = SpielerRichtung.HOCH
-                } else if (event.key === "a") {
-                    console.log("Richtung ist nun LINKS");
-                    spielerRichtung.richtung = SpielerRichtung.LINKS
-                } else if (event.key === "s") {
-                    console.log("Richtung ist nun RUNTER");
-                    spielerRichtung.richtung = SpielerRichtung.RUNTER
-                } else if (event.key === "d") {
-                    console.log("Richtung ist nun RECHTS");
-                    spielerRichtung.richtung = SpielerRichtung.RECHTS
-                }  
-            });
+            // window.addEventListener: Funktion des Webbrowsers. Wir fügen einen 
+            // "Eventlistener" (Eventlauscher) hinzu für das Event "keypress". So heißt
+            // das Event/das Ereignis, wenn eine Taste auf der Tastatur gedrückt wird.
+            window.addEventListener(
+                // "keypress"-Ereignis = Taste gedrückt
+                // wird vom Webbrowser aufgerufen/ausgelöst
+                'keypress',
+                // anonyme Funktion (ohne Namen), die ausgeführt wird,
+                // wenn das Event eintritt.
+                function(event) {
+                    // "event" hat Informationen über das aufgetretene Event/Ereignis,
+                    // z.B. welche Taste gedrückt wurde.
+                    if (event.key === "w") {
+                        spielerRichtung.richtung = SpielerRichtung.HOCH
+                    } else if (event.key === "a") {
+                        spielerRichtung.richtung = SpielerRichtung.LINKS
+                    } else if (event.key === "s") {
+                        spielerRichtung.richtung = SpielerRichtung.RUNTER
+                    } else if (event.key === "d") {
+                        spielerRichtung.richtung = SpielerRichtung.RECHTS
+                    }
+                }
+            );
         }
 
         // Konfiguriert den "Eventlistener" (Ereignislauscher) für Controllereingaben.
@@ -240,6 +248,9 @@
         
             // Ich benutze hier die Bibliothek "/alvaromontoro/gamecontroller.js"
             // https://github.com/alvaromontoro/gamecontroller.js
+            // Eine Bibliothek = Sammlung von Funktionen
+            // Vorteil: Wiederverwendung von gutem, funktionierenden Code, den andere
+            // geschrieben haben
             gameControl.on('connect', function(gamepad) {
                 console.log('Controller verbunden');
                 
@@ -272,7 +283,8 @@
 
                 // -----------------------------------
 
-                // Linker Stick hoch
+                // Linker Stick
+
                 gamepad.before('up0', function() { 
                     console.log("Richtung ist nun HOCH")
                     spielerRichtung.richtung = SpielerRichtung.HOCH
@@ -290,7 +302,9 @@
                     spielerRichtung.richtung = SpielerRichtung.RECHTS
                 })
 
-                // Rechter Stick hoch
+                
+                // Rechter Stick 
+
                 gamepad.before('up1', function() { 
                     console.log("Richtung ist nun HOCH")
                     spielerRichtung.richtung = SpielerRichtung.HOCH

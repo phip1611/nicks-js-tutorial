@@ -30,7 +30,6 @@
         summe = addieren(1000, 14);
         console.log(`summe=`, summe);
 
-
         // #################################################################################
 
         // Beispiel aus dem Snake Spiel:
@@ -48,9 +47,28 @@
             }
             return spielfeld;
         }
+        
         // bauen ein Spielfeld mit 10x10 Feldern
         const spielfeld = baueSpielfeld(10, 10);
+        console.log("Spielfeld:");
         console.dir(spielfeld);
+
+        // #################################################################################
+        // function addieren(zahl_a, zahl_b) {
+        // zahl_a, zahl_b: Werden auch "Argumente" oder "Parameter" der Funktion genannt
+
+        
+        // Anonyme Funktionen
+        // Wenn eine Funktion einen Namen hat, kann man sie von überall aufrufen.
+        // Eine Funktion kann aber auch keinen Namen haben, zum Beispiel:
+        const multiplizierungsFunktion = function(zahl_a, zahl_b) { 
+            return zahl_a * zahl_b 
+        }
+        // dann müssen wir sie aber in einer Variable speichern, um darauf
+        // zuzugreifen. Hier habe ich sie in der Variable "multiplizierungsFunktion"
+        // gespeichert.
+        const produkt = multiplizierungsFunktion(7, 8);
+        console.log(`produkt=`, produkt);
     </script>
 </head>
 
