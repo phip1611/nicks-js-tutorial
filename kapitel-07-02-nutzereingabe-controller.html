@@ -1,6 +1,5 @@
 <!doctype html>
 <html>
-
 <head>
     <script src="./gamepadcontroller.min.js"></script>
     <script>
@@ -25,6 +24,7 @@
         // wir simulieren, das wir zweimal pro Sekunde das Spiel aktualisieren und 
         // wissen wollen, in welche Richtung sich der Spieler aktuell bewegt
         window.setInterval(
+            // anonyme Funktion, die alle 500 Millisekunden ausgeführt wird.
             function() {
                 console.log(`Aktuelle Richtung ist: ${spielerRichtung.richtung}`);
             },
@@ -32,25 +32,14 @@
             500 
         );
 
-        // Starte Eventlistener (Eventlauscher), der Tastatureingaben überwacht
-        // WASD
-        window.addEventListener('keypress', (event) => {
-            if (event.key === "w") {
-                spielerRichtung.richtung = SpielerRichtung.HOCH
-            } else if (event.key === "a") {
-                spielerRichtung.richtung = SpielerRichtung.LINKS
-            } else if (event.key === "s") {
-                spielerRichtung.richtung = SpielerRichtung.RUNTER
-            } else if (event.key === "d") {
-                spielerRichtung.richtung = SpielerRichtung.RECHTS
-            }
-        });
 
-
-        // zusätzlich noch Gamepad/Controllereingaben überprüfen
+        // Gamepad/Controllereingaben überprüfen
 
         // Ich benutze hier die Bibliothek "/alvaromontoro/gamecontroller.js"
         // https://github.com/alvaromontoro/gamecontroller.js
+        // Eine Bibliothek = Sammlung von Funktionen
+        // Vorteil: Wiederverwendung von gutem, funktionierenden Code, den andere
+        // geschrieben haben
         
         // "gameControl" ist ein Objekt, das aus der verwendeten Bibliothek kommt
         gameControl.on('connect', function(gamepad) {
@@ -81,7 +70,8 @@
 
             // -----------------------------------
 
-            // Linker Stick hoch
+            // Linker Stick 
+
             gamepad.before('up0', function() { 
                 spielerRichtung.richtung = SpielerRichtung.HOCH
             })
@@ -95,7 +85,9 @@
                 spielerRichtung.richtung = SpielerRichtung.RECHTS
             })
 
-            // Rechter Stick hoch
+            
+            // Rechter Stick 
+
             gamepad.before('up1', function() { 
                 spielerRichtung.richtung = SpielerRichtung.HOCH
             })

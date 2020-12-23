@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // Hier zeige ich, wie wir Nutzereingabe von der Tastatur bekommen können
+        // sowie vom Controller.
+
+        // Die vier Richtungen, in die sich ein Spieler bei Snake bewegen kann
+        const SpielerRichtung = {
+            HOCH: 0,
+            LINKS: 1,
+            RECHTS: 2,
+            RUNTER: 3,
+        }
+
+        // wir benutzen hier ein Objekt, damit die Funktionen bei der Nutzereingabe
+        // das globale(also gleiche) Objekt verändern und wir überall auf die gleichen
+        // aktuellsten Daten zugreifen.
+        const spielerRichtung = {
+            // Das ist der Wert, der bei einem Tastendruck aktualisiert wird
+            richtung: SpielerRichtung.RUNTER
+        }
+
+        // wir simulieren, das wir zweimal pro Sekunde das Spiel aktualisieren und 
+        // wissen wollen, in welche Richtung sich der Spieler aktuell bewegt
+        window.setInterval(
+            // anonyme Funktion, die alle 500 Millisekunden ausgeführt wird.
+            function() {
+                console.log(`Aktuelle Richtung ist: ${spielerRichtung.richtung}`);
+            },
+            // 500 Millisekunden = 2 Mal pro Sekunde
+            500 
+        );
+
+        // window.addEventListener: Funktion des Webbrowsers. Wir fügen einen 
+        // "Eventlistener" (Eventlauscher) hinzu für das Event "keypress". So heißt
+        // das Event/das Ereignis, wenn eine Taste auf der Tastatur gedrückt wird.
+        window.addEventListener(
+            // "keypress"-Ereignis = Taste gedrückt
+            // wird vom Webbrowser aufgerufen/ausgelöst
+            'keypress',
+            // anonyme Funktion (ohne Namen), die ausgeführt wird,
+            // wenn das Event eintritt.
+            function(event) {
+                // "event" hat Informationen über das aufgetretene Event/Ereignis,
+                // z.B. welche Taste gedrückt wurde.
+                if (event.key === "w") {
+                    spielerRichtung.richtung = SpielerRichtung.HOCH
+                } else if (event.key === "a") {
+                    spielerRichtung.richtung = SpielerRichtung.LINKS
+                } else if (event.key === "s") {
+                    spielerRichtung.richtung = SpielerRichtung.RUNTER
+                } else if (event.key === "d") {
+                    spielerRichtung.richtung = SpielerRichtung.RECHTS
+                }
+            }
+        );
+    </script>
+</head>
+
+<body></body>
+
+</html>
