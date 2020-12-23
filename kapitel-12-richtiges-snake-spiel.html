@@ -32,7 +32,12 @@
             LEER: 0,
             WAND: 1,
             SPIELER: 2,
+            MUENZE: 3,
         }
+
+        // In dieser Variable speichern wir in jeder Runde,
+        // ob eine Münze auf dem Feld ist.
+        let muenze_auf_spielfeld = false;
 
         function starteSpiel() {
             const canvas = document.getElementById("spielfeld");
@@ -53,18 +58,20 @@
                 spielfeld[y][BREITE - 1] = SpielfeldMarker.WAND;
             }
 
-            // Plaziere Spieler
-            // Spieler ist zu beginn oben links 
-            // wir merken uns im gesamten Spiel die Position
-            let spielerPosition = {
-                x: 1, // Spalte des Spielerkopfes
-                y: 1, // Zeile des Spielerkopfes
-            }
-            // In das Spielfeld einzeichnen
-            spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.SPIELER;
 
-            // loggen in die Konsole, wie das Spielfeld aussieht
-            console.dir(spielfeld);
+            // Im komplexen Snake-Spiel ist die SpielerPosition ein
+            // Array (Liste) aus Objekten mit x- und y-Koordinate
+            // Das ist notwendig um zu wissen wo der Kopf
+            // und wo der Schwanz der Schlange ist
+            let spielerPosition = [
+                {
+                    x: 1,
+                    y: 1,
+                }
+            ];
+
+            // Kopf der Schlange in das Spielfeld eintragen
+            spielfeld[spielerPosition[0].y][spielerPosition[0].x] = SpielfeldMarker.SPIELER;
 
             // noch die initiale Richtung des Spielers setzen, in die er/sie sich bewegt.
             // Wir nutzen ein Objekt, damit die Funktionen bei der Tastatureingabe
@@ -80,9 +87,11 @@
             konfiguriereNutzereingabeTastatur(spielerRichtung);
             konfiguriereNutzereingabeController(spielerRichtung);
 
+            // initial eine Münze in das Spiel zeichnen.
+            platziereMuenzeFallsNotwendig(spielfeld);
+
             // Male das initiale Spielfeld auf den Bildschirm
             maleSpielfeld(spielfeld, ctx);
-
 
             //-------------------BEGIN "SPIELSCHLEIFE"-------------------
             // Code der immer wieder ausgeführt wird und immer die aktualisierte
@@ -93,40 +102,78 @@
             // Sekunde geschieht. Dafür sind Intervalle in Javascript gut geeignet.
             // Mit anderen Worten: Der Spieler kann hier pro Sekunde genau ein
             // Feld vorrücken.
-            const AKTIONEN_PRO_SEKUNDE = 1;
+            const AKTIONEN_PRO_SEKUNDE = 3;
             const MILLISEKUNDEN = 1000 / AKTIONEN_PRO_SEKUNDE;
 
             // Ein Interval wird normalerweise unendlich oft aufgerufen.
             // Wir speichern hier die Interval-ID um das Interval bei
             // Spielende beenden zu können.
             const interval = window.setInterval(function() {
-                // Wir haben hier ein einfaches Snake-Spiel ohne "Schwanz"
-                // Daher wird das Feld hinter dem Spieler einfach immer wieder
-                // "leer"/weiß
-                spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.LEER;
-
+                
                 // Aktualisierte die Variable spielerPosition bezüglich
                 // der von Eingabe angegebenen Richtung.
                 // Die Funktion verändert die Variable "spielerPosition"
-                aktualisiereSpielerPosition(spielerRichtung, spielerPosition);
-
-                const naechstesSpielfeld = spielfeld[spielerPosition.y][spielerPosition.x];
-                if (naechstesSpielfeld !== SpielfeldMarker.LEER) {
+                aktualisiereSpielerPosition(spielerRichtung, spielerPosition, spielfeld);
+                
+                const kopf = spielerPosition[0];
+                // der neue Kopf der Schlange
+                const ende = spielerPosition[spielerPosition.length - 1];
+                const naechstes_feld = spielfeld[kopf.y][kopf.x];
+                if (naechstes_feld === SpielfeldMarker.WAND) {
                     window.clearInterval(interval);
                     alert("Du hast die Wand berührt und verloren!");
-                } else {
-                    spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.SPIELER; 
+                    return;
+                }
+                else if (naechstes_feld === SpielfeldMarker.SPIELER) {
+                    window.clearInterval(interval);
+                    alert("Du hast dich selbst berührt und verloren!");
+                    return;
                 }
 
+                // WICHTIG: Spielfeldaktualisierung für den Fall,
+                // dass wir keine Münze eingesammelt haben
+                if (naechstes_feld !== SpielfeldMarker.MUENZE) {
+                    // jetzt entfernen wir noch das letzte Segment vom Schwanz,
+                    // falls wir doch keine Münze gegessen haben
+                    spielfeld[ende.y][ende.x] = SpielfeldMarker.LEER;
+                    // entferne das Ende, da unsere Schlange nicht gewachsen ist
+                    spielerPosition.pop();
+                } else {
+                    // dadruch wird platziereMuenzeFallsNotwendig()
+                    // aktiv
+                    muenze_auf_spielfeld = false;
+                }
+                
+                // übertragen alle Spielerpositionen in das spielfeld
+                for (let i = 0; i < spielerPosition.length; i++) {
+                    const x = spielerPosition[i].x;
+                    const y = spielerPosition[i].y;
+                    spielfeld[y][x] = SpielfeldMarker.SPIELER
+                }
+                
+
+                // neue Münze platzieren
+                platziereMuenzeFallsNotwendig(spielfeld);
+                // das aktualisierte Spielbrett nun auf den Bildschirm zeichnen
                 maleSpielfeld(spielfeld, ctx);
+
+                if (hatGewonnen(spielerPosition)) {
+                    window.clearInterval(interval);
+                    alert("Du hast das Spiel gewonnen!");
+                    return;
+                }
             }, MILLISEKUNDEN);
         }
         //-------------------ENDE "SPIELSCHLEIFE"-------------------
 
         // Aktualisiert die Spielerposition bezüglich der aktiven Richtung
         // (Tastatureingabe). Überprüft ob die Bewegung erlaubt ist.
-        // Ein Richtungswechsel um 180 Grad ist unerlaubt.
-        function aktualisiereSpielerPosition(spielerRichtung, spielerPosition) {
+        // Ein Richtungswechsel um 180 Grad ist unerlaubt. Verändert aber keine
+        // Infos im Spielfeld!
+        // Verlängert die Schlange in jedem Fall! Das ist notwendig um nach dieser Funktion
+        // am Ende entweder das Feld wieder weiß zu färben oder als Teil der Schlange
+        // eingefärbt zu lassen.
+        function aktualisiereSpielerPosition(spielerRichtung, spielerPosition, spielfeld) {
             // Bewegungsrichtung beim letzten Spielschritt
             const warHoch = spielerRichtung.vorherige_richtung === SpielerRichtung.HOCH;
             const warLinks = spielerRichtung.vorherige_richtung === SpielerRichtung.LINKS;
@@ -161,20 +208,65 @@
                 // Merken, damit wir beim nächsten Aufruf die vorherige Position wissen
                 spielerRichtung.vorherige_richtung = spielerRichtung.richtung;
             }
+           
+            // Bewegen zunächst jedes Element der Schlange
+            // eins weiter. Damit der Code einfacher wird tun
+            // wir zunächst so, als ob wor eine Münze gegessen haben.
 
+            // machen das Array ein Element länger; der Wert ist egal
+            // da der nun sowieso gleich überschrieben wird
+            spielerPosition.push({x: 0, y: 0});
+            
+            // wir gehen Rückwarts durch dass Array
+            for (let i = spielerPosition.length - 1; i > 0; i = i - 1) {
+                // wir schieben jedes Element eins weiter
+                // das erste Segment wird zum zweiten, das zweite Segment zum dritten usw..
+                
+                // NICHT SO spielerPosition[i] = spielerPosition[i - 1];
+                // sondern so
+                spielerPosition[i].x = spielerPosition[i - 1].x;
+                spielerPosition[i].y = spielerPosition[i - 1].y;
+                // ansonsten sind beide Listenelemente das identische Objekt
+            }
+
+            // jetzt aktualisieren wir die Spitze/den neuen Kopf
             if (istHoch) {
                 // Y Position ändert sich -1
-                spielerPosition.y = spielerPosition.y - 1;
+                spielerPosition[0].y = spielerPosition[1].y - 1;
+                spielerPosition[0].x = spielerPosition[1].x;
             } else if (istLinks) {
                 // X Position ändert sich -1
-                spielerPosition.x = spielerPosition.x - 1;
+                spielerPosition[0].y = spielerPosition[1].y;
+                spielerPosition[0].x = spielerPosition[1].x - 1;
             } else if (istRunter) {
                 // Y Position ändert sich +1
-                spielerPosition.y = spielerPosition.y + 1;
+                spielerPosition[0].y = spielerPosition[1].y + 1;
+                spielerPosition[0].x = spielerPosition[1].x;
             } else if (istRechts) {
                 // X Position ändert sich +1
-                spielerPosition.x = spielerPosition.x + 1;
+                spielerPosition[0].y = spielerPosition[1].y;
+                spielerPosition[0].x = spielerPosition[1].x + 1;
             }
+        }
+
+        // Wenn auf dem Spielfeld keine Münze ist, dann
+        // wird eine zufällig platziert.
+        function platziereMuenzeFallsNotwendig(spielfeld) {
+            while (!muenze_auf_spielfeld) {
+                // Minus zwei, da oben/unten und links/rechts
+                // nur Wand ist, d.h. nicht nutzbares Spielfeld
+                const x = holeZufalligeZahl(1, BREITE - 2);
+                const y = holeZufalligeZahl(1, HOEHE - 2);
+                if (spielfeld[y][x] === SpielfeldMarker.LEER) {
+                    spielfeld[y][x] = SpielfeldMarker.MUENZE;
+                    muenze_auf_spielfeld = true;
+                }
+            }
+        }
+
+        // Generiert eine zufällige ganze Zahl innerhalb der Grenzen.
+        function holeZufalligeZahl(min, max) {
+            return min + Math.floor(Math.random() * max - min);
         }
         
         // Malt das komplette Spielfeld auf den Bildschirm.
@@ -211,6 +303,9 @@
             } else if (marker === SpielfeldMarker.LEER) {
                 // Weiß
                 return "rgb(255,255,255)";
+            } else if (marker === SpielfeldMarker.MUENZE) {
+                // gelb
+                return "rgb(255,255,0)";
             }  
         }
 
@@ -256,6 +351,11 @@
                     }
                 }
             );
+        }
+
+        function hatGewonnen(spielerPosition) {
+            let nutzbare_felder = (HOEHE - 2) * (BREITE - 2)
+            return nutzbare_felder === spielerPosition.length
         }
 
         // Konfiguriert den "Eventlistener" (Ereignislauscher) für Controllereingaben.
