@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="./gamepadcontroller.min.js"></script>
+    <script>
+        // Hier zeige ich, wie wir Nutzereingabe von der Tastatur bekommen können
+        // sowie vom Controller.
+
+        // Die vier Richtungen, in die sich ein Spieler bei Snake bewegen kann
+        const SpielerRichtung = {
+            HOCH: 0,
+            LINKS: 1,
+            RECHTS: 2,
+            RUNTER: 3,
+        }
+
+        // wir benutzen hier ein Objekt, damit die Funktionen bei der Nutzereingabe
+        // das globale(also gleiche) Objekt verändern und wir überall auf die gleichen
+        // aktuellsten Daten zugreifen.
+        const spielerRichtung = {
+            richtung: SpielerRichtung.RUNTER
+        }
+
+        // wir simulieren, das wir zweimal pro Sekunde das Spiel aktualisieren und 
+        // wissen wollen, in welche Richtung sich der Spieler aktuell bewegt
+        window.setInterval(
+            function() {
+                console.log(`Aktuelle Richtung ist: ${spielerRichtung.richtung}`);
+            },
+            // 500 Millisekunden = 2 Mal pro Sekunde
+            500 
+        );
+
+        // Starte Eventlistener (Eventlauscher), der Tastatureingaben überwacht
+        // WASD
+        window.addEventListener('keypress', (event) => {
+            if (event.key === "w") {
+                spielerRichtung.richtung = SpielerRichtung.HOCH
+            } else if (event.key === "a") {
+                spielerRichtung.richtung = SpielerRichtung.LINKS
+            } else if (event.key === "s") {
+                spielerRichtung.richtung = SpielerRichtung.RUNTER
+            } else if (event.key === "d") {
+                spielerRichtung.richtung = SpielerRichtung.RECHTS
+            }
+        });
+
+
+        // zusätzlich noch Gamepad/Controllereingaben überprüfen
+
+        // Ich benutze hier die Bibliothek "/alvaromontoro/gamecontroller.js"
+        // https://github.com/alvaromontoro/gamecontroller.js
+        
+        // "gameControl" ist ein Objekt, das aus der verwendeten Bibliothek kommt
+        gameControl.on('connect', function(gamepad) {
+            console.log('Controller verbunden');
+            
+            // In der Dokumentation steht welcher Button was ist!
+            
+            // Pfeiltaste oben
+            gamepad.before('button12', function() { 
+                spielerRichtung.richtung = SpielerRichtung.HOCH
+            })
+            
+            // Pfeiltaste links
+            gamepad.before('button14', function() { 
+                spielerRichtung.richtung = SpielerRichtung.LINKS
+            })
+
+            
+            // Pfeiltaste unten
+            gamepad.before('button13', function() { 
+                spielerRichtung.richtung = SpielerRichtung.RUNTER
+            })
+
+            // Pfeiltaste rechts
+            gamepad.before('button15', function() { 
+                spielerRichtung.richtung = SpielerRichtung.RECHTS
+            })
+
+            // -----------------------------------
+
+            // Linker Stick hoch
+            gamepad.before('up0', function() { 
+                spielerRichtung.richtung = SpielerRichtung.HOCH
+            })
+            gamepad.before('left0', function() { 
+                spielerRichtung.richtung = SpielerRichtung.LINKS
+            })
+            gamepad.before('down0', function() { 
+                spielerRichtung.richtung = SpielerRichtung.RUNTER
+            })
+            gamepad.before('right0', function() { 
+                spielerRichtung.richtung = SpielerRichtung.RECHTS
+            })
+
+            // Rechter Stick hoch
+            gamepad.before('up1', function() { 
+                spielerRichtung.richtung = SpielerRichtung.HOCH
+            })
+            gamepad.before('left1', function() { 
+                spielerRichtung.richtung = SpielerRichtung.LINKS
+            })
+            gamepad.before('down1', function() { 
+                spielerRichtung.richtung = SpielerRichtung.RUNTER
+            })
+            gamepad.before('right1', function() { 
+                spielerRichtung.richtung = SpielerRichtung.RECHTS
+            })
+        });
+
+
+    </script>
+</head>
+
+<body></body>
+
+</html>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+<head>
+    <title>Nicks Snake Spiel</title>
+    <script src="./gamepadcontroller.min.js"></script>
+    <script>
+        // Wenn das HTML fertig geladen ist, dann starte das Spiel.
+        // Wert = Name der Funktion, die ausgeführt werden soll.
+        // Das ist notwendig, damit das <canvas>-Element im HTML
+        // vom Browser geladen ist, bevor das Javascript startet.
+        window.onload = starteSpiel;
+
+        // GLOBALE KONSTANTEN (im ganzen Programm sichtbar)
+        const BREITE_SPIELFELD_PIXEL = 400;
+        const BREITE = 10;
+        const HOEHE = 10;
+        // Jeder Spielfeldpunkt ist 40x40 Pixel groß
+        // hoehe=breite, da wir Quadrate haben
+        const BREITE_PIXEL = BREITE_SPIELFELD_PIXEL / BREITE;
+        const HOEHE_PIXEL = BREITE_SPIELFELD_PIXEL / HOEHE;
+
+        // Die vier Richtungen, in die sich ein Spieler bei Snake bewegen kann
+        const SpielerRichtung = {
+            HOCH: 0,
+            LINKS: 1,
+            RECHTS: 2,
+            RUNTER: 3,
+        }
+
+        // Die möglichen Arten, die ein Pixel auf dem Spielfeld darstellt
+        const SpielfeldMarker = {
+            LEER: 0,
+            WAND: 1,
+            SPIELER: 2,
+        }
+
+        function starteSpiel() {
+            const canvas = document.getElementById("spielfeld");
+            const ctx = canvas.getContext("2d");
+
+            // Spielfeld aufbauen mit BREITE x HOEHE Feldern (10x10)
+            const spielfeld = baueSpielfeld(HOEHE, BREITE);
+            // Spielfeld fertig aufgebaut
+
+            // Grenzen einzeichnen
+            // ganz oben, ganz unten, ganz links und ganz rechts: Wand einzeichnen
+            for (let x = 0; x < BREITE; x++) {      
+                spielfeld[0][x] = SpielfeldMarker.WAND;
+                spielfeld[HOEHE - 1][x] = SpielfeldMarker.WAND;
+            }
+            for (let y = 0; y < HOEHE; y++) {      
+                spielfeld[y][0] = SpielfeldMarker.WAND;
+                spielfeld[y][BREITE - 1] = SpielfeldMarker.WAND;
+            }
+
+            // Plaziere Spieler
+            // Spieler ist zu beginn oben links 
+            // wir merken uns im gesamten Spiel die Position
+            let spielerPosition = {
+                x: 1, // Spalte des Spielerkopfes
+                y: 1, // Zeile des Spielerkopfes
+            }
+            // In das Spielfeld einzeichnen
+            spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.SPIELER;
+
+            // loggen in die Konsole, wie das Spielfeld aussieht
+            console.dir(spielfeld);
+
+            // noch die initiale Richtung des Spielers setzen, in die er/sie sich bewegt.
+            // Wir nutzen ein Objekt, damit die Funktionen bei der Tastatureingabe
+            // diesen Wert aktualisieren können.
+            const spielerRichtung = {
+                // So können wir überprüfen ob ein Spieler versucht umzudrehen
+                // beispielsweise von RUNTER nach HOCH zu wechseln. Das muss
+                // verboten werden
+                vorherige_richtung: SpielerRichtung.RUNTER,
+                // dieses Feld wird von der Nutzereingabe verändert
+                richtung: SpielerRichtung.RUNTER
+            }
+            konfiguriereNutzereingabeTastatur(spielerRichtung);
+            konfiguriereNutzereingabeController(spielerRichtung);
+
+            // Male das initiale Spielfeld auf den Bildschirm
+            maleSpielfeld(spielfeld, ctx);
+
+            // Starte Spielschleife: Endlosschleife
+            // Pro Sekunde ein Feld vorrücken
+            const AKTIONEN_PRO_SEKUNDE = 2;
+            const MILLISEKUNDEN = 1000 / AKTIONEN_PRO_SEKUNDE;
+            // starten ein Interval. Diese Funktion wird einmal pro Sekunde
+            // aufgerufen. Die 1000 steht für 1000ms (Millisekunden) = 1s.
+            const interval = window.setInterval(() => {
+
+                // aktualisiere Spielerposition
+                // die alte Spielerposition wird wieder leer
+                spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.LEER;
+                // aktualisierte die Variable spielerPosition; nach der Zeile ist die Variable aktualisiert
+                aktualisiereSpielerPosition(spielerRichtung, spielerPosition);
+
+                
+                const naechstesSpielfeld = spielfeld[spielerPosition.y][spielerPosition.x];
+                if (naechstesSpielfeld !== SpielfeldMarker.LEER) {
+                    window.clearInterval(interval);
+                    alert("Du hast die Wand berührt und verloren!");
+                } else {
+                    spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.SPIELER; 
+                }
+
+                maleSpielfeld(spielfeld, ctx);
+            }, MILLISEKUNDEN);
+        }
+
+        // Aktualisiert die Spielerposition bezüglich der aktiven Richtung
+        // (Tastatureingabe). Überprüft ob die Bewegung erlaubt ist.
+        // Ein Richtungswechsel um 180 Grad ist unerlaubt.
+        function aktualisiereSpielerPosition(spielerRichtung, spielerPosition) {
+            // Bewegungsrichtung beim letzten Spielschritt
+            const warHoch = spielerRichtung.vorherige_richtung === SpielerRichtung.HOCH;
+            const warLinks = spielerRichtung.vorherige_richtung === SpielerRichtung.LINKS;
+            const warRunter = spielerRichtung.vorherige_richtung === SpielerRichtung.RUNTER;
+            const warRechts = spielerRichtung.vorherige_richtung === SpielerRichtung.RECHTS;
+
+            // Aktuell ausgewählte Bewegungsrichtung
+            const istHoch = spielerRichtung.richtung === SpielerRichtung.HOCH;
+            const istLinks = spielerRichtung.richtung === SpielerRichtung.LINKS;
+            const istRunter = spielerRichtung.richtung === SpielerRichtung.RUNTER;
+            const istRechts = spielerRichtung.richtung === SpielerRichtung.RECHTS;
+
+            const istEntgegengesetzteRichtung = 
+                (istHoch && warRunter)
+                || (istRunter && warHoch)
+                || (istLinks && warRechts)
+                || (istRechts && warLinks);
+
+            if (istEntgegengesetzteRichtung) {
+                console.warn("Der Spieler versuchte die Richtung um 180 Grad zu wechseln. Das ist verboten.");
+                spielerRichtung.richtung = spielerRichtung.vorherige_richtung;
+                
+                // Wir rufen die Funktion nochmal neu auf ("rekursiver Aufruf")
+                // nun aber mit der aktualisierten/erlaubten Spielerrichtung.
+                // so verhindern wir, dass der Spieler in eine verbotene richtung geht.
+                aktualisiereSpielerPosition(spielerRichtung, spielerPosition);
+                // Funktion abbrechen
+                return;
+            } else {
+                spielerRichtung.vorherige_richtung = spielerRichtung.richtung;
+            }
+
+            if (istHoch) {
+                // Y Position ändert sich -1
+                spielerPosition.y = spielerPosition.y - 1;
+            } else if (istLinks) {
+                // X Position ändert sich -1
+                spielerPosition.x = spielerPosition.x - 1;
+            } else if (istRunter) {
+                // Y Position ändert sich +1
+                spielerPosition.y = spielerPosition.y + 1;
+            } else if (istRechts) {
+                // X Position ändert sich +1
+                spielerPosition.x = spielerPosition.x + 1;
+            }
+        }
+        
+        // Malt das komplette Spielfeld auf den Bildschirm.
+        function maleSpielfeld(spielfeld, ctx) {
+            // für jede Zeile
+            for (let y = 0; y < HOEHE; y++) {
+                // für jede Spalte
+                for (let x = 0; x < BREITE; x++) {
+                    let marker = spielfeld[y][x];
+                    // Farbe setzen, in der das nächste Rechteckt eingezeichnet wird
+                    ctx.fillStyle = holeFarbeFuerMarker(marker);
+                    // das Rechteck in die Zeichenfläche malen
+                    ctx.fillRect(
+                        // X-Verschiebung
+                        x * BREITE_PIXEL,
+                        // Y-Verschiebung
+                        y * HOEHE_PIXEL,
+                        BREITE_PIXEL,
+                        HOEHE_PIXEL
+                    );
+                }                
+            }
+        }
+
+        // Gibt für jeden Marker (Wand, Leer, Spieler) die Farbe zurück,
+        // die in das Quadrat auf dem Bildschirm gemalt werden soll.
+        function holeFarbeFuerMarker(marker) {
+            if (marker === SpielfeldMarker.SPIELER) {
+                // Rot
+                return "rgb(255,0,0)";
+            } else if (marker === SpielfeldMarker.WAND) {
+                // Schwarz
+                return "rgb(0,0,0)";
+            } else if (marker === SpielfeldMarker.LEER) {
+                // Weiß
+                return "rgb(255,255,255)";
+            }  
+        }
+
+        // baut ein Spielfeld (Liste von Listen mit den einzelnen Werten)
+        // Um jedes Feld in jeder Spalte und jeder Zeile erreichen zu können.
+        function baueSpielfeld(hoehe, breite) {
+            let spielfeld = [];
+            for (let zeile = 0; zeile < hoehe; zeile = zeile + 1) {
+                // Sagen, dass jede Zeile wiederum eine Liste ist
+                spielfeld[zeile] = [];
+                for (let spalte = 0; spalte < breite; spalte = spalte + 1) {
+                    // ".push()": fügen der Liste dynamisch ein weiteres Element hinzu
+                    spielfeld[zeile].push(
+                        SpielfeldMarker.LEER
+                    );
+                }
+            }
+            return spielfeld;
+        }
+
+        // Konfiguriert den "Eventlistener" (Ereignislauscher) für Tastatureingaben.
+        function konfiguriereNutzereingabeTastatur(spielerRichtung) {
+            window.addEventListener('keypress', (event) => {
+                if (event.key === "w") {
+                    console.log("Richtung ist nun HOCH");
+                    spielerRichtung.richtung = SpielerRichtung.HOCH
+                } else if (event.key === "a") {
+                    console.log("Richtung ist nun LINKS");
+                    spielerRichtung.richtung = SpielerRichtung.LINKS
+                } else if (event.key === "s") {
+                    console.log("Richtung ist nun RUNTER");
+                    spielerRichtung.richtung = SpielerRichtung.RUNTER
+                } else if (event.key === "d") {
+                    console.log("Richtung ist nun RECHTS");
+                    spielerRichtung.richtung = SpielerRichtung.RECHTS
+                }  
+            });
+        }
+
+        // Konfiguriert den "Eventlistener" (Ereignislauscher) für Controllereingaben.
+        function konfiguriereNutzereingabeController(spielerRichtung) {
+            // zusätzlich noch Gamepad/Controllereingaben überprüfen
+        
+            // Ich benutze hier die Bibliothek "/alvaromontoro/gamecontroller.js"
+            // https://github.com/alvaromontoro/gamecontroller.js
+            gameControl.on('connect', function(gamepad) {
+                console.log('Controller verbunden');
+                
+                // In der Dokumentation steht welcher Button was ist!
+                
+                // Pfeiltaste oben
+                gamepad.before('button12', function() { 
+                    console.log("Richtung ist nun HOCH")
+                    spielerRichtung.richtung = SpielerRichtung.HOCH
+                })
+                
+                // Pfeiltaste links
+                gamepad.before('button14', function() { 
+                    console.log("Richtung ist nun LINKS");
+                    spielerRichtung.richtung = SpielerRichtung.LINKS
+                })
+
+                
+                // Pfeiltaste unten
+                gamepad.before('button13', function() { 
+                    console.log("Richtung ist nun RUNTER");
+                    spielerRichtung.richtung = SpielerRichtung.RUNTER
+                })
+
+                // Pfeiltaste rechts
+                gamepad.before('button15', function() { 
+                    console.log("Richtung ist nun RECHTS");
+                    spielerRichtung.richtung = SpielerRichtung.RECHTS
+                })
+
+                // -----------------------------------
+
+                // Linker Stick hoch
+                gamepad.before('up0', function() { 
+                    console.log("Richtung ist nun HOCH")
+                    spielerRichtung.richtung = SpielerRichtung.HOCH
+                })
+                gamepad.before('left0', function() { 
+                    console.log("Richtung ist nun LINKS");
+                    spielerRichtung.richtung = SpielerRichtung.LINKS
+                })
+                gamepad.before('down0', function() { 
+                    console.log("Richtung ist nun RUNTER");
+                    spielerRichtung.richtung = SpielerRichtung.RUNTER
+                })
+                gamepad.before('right0', function() { 
+                    console.log("Richtung ist nun RECHTS");
+                    spielerRichtung.richtung = SpielerRichtung.RECHTS
+                })
+
+                // Rechter Stick hoch
+                gamepad.before('up1', function() { 
+                    console.log("Richtung ist nun HOCH")
+                    spielerRichtung.richtung = SpielerRichtung.HOCH
+                })
+                gamepad.before('left1', function() { 
+                    console.log("Richtung ist nun LINKS");
+                    spielerRichtung.richtung = SpielerRichtung.LINKS
+                })
+                gamepad.before('down1', function() { 
+                    console.log("Richtung ist nun RUNTER");
+                    spielerRichtung.richtung = SpielerRichtung.RUNTER
+                })
+                gamepad.before('right1', function() { 
+                    console.log("Richtung ist nun RECHTS");
+                    spielerRichtung.richtung = SpielerRichtung.RECHTS
+                })
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Zeichenfläche, in die wir mit Javascript zeichnen können. -->
+    <canvas id="spielfeld" width="400" height="400" style="display:block; margin: 0 auto; border: 1px solid #000"></canvas>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+Hey Nick,
+ich habe hier für dich eine Schritt-für-Schritt Einführung in die Grundlagen der Programmierung
+angefertigt. Die Beispiele sind in der Programmiersprache "Javascript" geschrieben.
+
+Das ist eine Programmiersprache, die von deinem Webbrowser ausgeführt wird. Der Webbrowser
+ist das, wsa du als "das Internet" kennst. Also das Program, das du benutzt um YouTube zu 
+schauen zum Beispiel.
+
+Über Javascript werden zum Beispiel Spiele im Internetbrowser programmiert.
+Ich habe für dich eine Schritt-für-Schritt Anleitung gebaut, wie wir ein ganz
+einfaches Snake-Spiel programmieren. Dafür musst du aber alle Kapitel der
+Reihe nach durcharbeiten. Dabei helfe ich dir gerne.
+
+Es ist wichtig, dass du alle Grundlagen verstehst. Dabei nehme ich auch immer Bezug darauf
+wieso das wichtig ist und wo/wie ich diese Dinge im Spiel benötige.
+
+Öffnen der Dateien:
+Zum Anschauen der Dateien kannst du sie öffnen mit "Rechtsklick > Öffnen mit > Microsoft Edge".

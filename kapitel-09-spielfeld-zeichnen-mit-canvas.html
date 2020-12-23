@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // Wenn der Browser das HTML geladen hat (das <canvas>-Element),
+        // dann führe die Funktion mit dem Name "starteSpiel" aus.
+        window.onload = starteSpiel;
+
+        const SpielfeldMarker = {
+            LEER: 0,
+            WAND: 1,
+            SPIELER: 2,
+        }
+        // GLOBALE KONSTANTEN (im ganzen Programm sichtbar)
+        const BREITE_SPIELFELD_PIXEL = 400;
+        const BREITE = 10;
+        const HOEHE = 10;
+        // Jeder Spielfeldpunkt ist 40x40 Pixel groß
+        // hoehe=breite, da wir Quadrate haben
+        const BREITE_PIXEL = BREITE_SPIELFELD_PIXEL / BREITE;
+        const HOEHE_PIXEL = BREITE_SPIELFELD_PIXEL / HOEHE;
+
+        function starteSpiel() {
+            const canvas = document.getElementById("spielfeld");
+            const ctx = canvas.getContext("2d");
+
+            // Spielfeld aufbauen mit BREITE x HOEHE Feldern (10x10)
+            const spielfeld = baueSpielfeld(HOEHE, BREITE);
+            // Spielfeld fertig aufgebaut
+
+            // Grenzen einzeichnen
+            // ganz oben, ganz unten, ganz links und ganz rechts: Wand einzeichnen
+            for (let x = 0; x < BREITE; x++) {      
+                spielfeld[0][x] = SpielfeldMarker.WAND;
+                spielfeld[HOEHE - 1][x] = SpielfeldMarker.WAND;
+            }
+            for (let y = 0; y < HOEHE; y++) {      
+                spielfeld[y][0] = SpielfeldMarker.WAND;
+                spielfeld[y][BREITE - 1] = SpielfeldMarker.WAND;
+            }
+
+            
+            // Plaziere Spieler
+            // Spieler ist zu beginn oben links 
+            // wir merken uns im gesamten Spiel die Position
+            let spielerPosition = {
+                x: 1, // Spalte des Spielerkopfes
+                y: 1, // Zeile des Spielerkopfes
+            }
+            // In das Spielfeld einzeichnen
+            spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.SPIELER;
+
+            // loggen in die Konsole, wie das Spielfeld aussieht
+            console.dir(spielfeld);
+
+            maleSpielfeld(spielfeld, ctx);
+        }
+
+        // baut ein Spielfeld (Liste von Listen mit den einzelnen Werten)
+        // Um jedes Feld in jeder Spalte und jeder Zeile erreichen zu können.
+        function baueSpielfeld(hoehe, breite) {
+            let spielfeld = [];
+            for (let zeile = 0; zeile < hoehe; zeile = zeile + 1) {
+                // Sagen, dass jede Zeile wiederum eine Liste ist
+                spielfeld[zeile] = [];
+                for (let spalte = 0; spalte < breite; spalte = spalte + 1) {
+                    // ".push()": fügen der Liste dynamisch ein weiteres Element hinzu
+                    spielfeld[zeile].push(
+                        SpielfeldMarker.LEER
+                    );
+                }
+            }
+            return spielfeld;
+        }
+
+        // Malt das komplette Spielfeld auf den Bildschirm.
+        function maleSpielfeld(spielfeld, ctx) {
+            // für jede Zeile
+            for (let y = 0; y < HOEHE; y++) {
+                // für jede Spalte
+                for (let x = 0; x < BREITE; x++) {
+                    let marker = spielfeld[y][x];
+                    // Farbe setzen, in der das nächste Rechteckt eingezeichnet wird
+                    ctx.fillStyle = holeFarbeFuerMarker(marker);
+                    // das Rechteck in die Zeichenfläche malen
+                    ctx.fillRect(
+                        // X-Verschiebung
+                        x * BREITE_PIXEL,
+                        // Y-Verschiebung
+                        y * HOEHE_PIXEL,
+                        BREITE_PIXEL,
+                        HOEHE_PIXEL
+                    );
+                }                
+            }
+        }
+
+        // Gibt für jeden Marker (Wand, Leer, Spieler) die Farbe zurück,
+        // die in das Quadrat auf dem Bildschirm gemalt werden soll.
+        function holeFarbeFuerMarker(marker) {
+            if (marker === SpielfeldMarker.SPIELER) {
+                // Rot
+                return "rgb(255,0,0)";
+            } else if (marker === SpielfeldMarker.WAND) {
+                // Schwarz
+                return "rgb(0,0,0)";
+            } else if (marker === SpielfeldMarker.LEER) {
+                // Weiß
+                return "rgb(255,255,255)";
+            }  
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Zeichenfläche, in die wir mit Javascript zeichnen können. -->
+    <canvas id="spielfeld" width="400" height="400" style="display:block; margin: 0 auto; border: 1px solid #000"></canvas>
+</body>
+
+</html>

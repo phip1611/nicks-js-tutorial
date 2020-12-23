@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // Wenn der Browser das HTML geladen hat (das <canvas>-Element),
+        // dann führe die Funktion mit dem Name "starteSpiel" aus.
+        window.onload = starteSpiel;
+
+        function starteSpiel() {
+            // Canvas ist ein Zeichenelement. Das heißt wir können Pixel
+            // für Pixel in diesem Bereich etwas malen
+            const canvas = document.getElementById("spielfeld");
+            // Context ist die Schnittstelle zwischen unserem Code und der
+            // Zeichenfläche
+            const ctx = canvas.getContext("2d");
+
+            // was wir als nächstes Zeichnen wird rot
+            ctx.fillStyle = "rgb(255,0,0)";
+
+            // ein Rechteck in die Zeichenfläche malen
+            ctx.fillRect(
+                // X-Verschiebung in Pixeln
+                0,
+                // Y-Verschiebung in Pixeln
+                0,
+                // Breite in Pixeln
+                40,
+                // Höhe in Pxieln
+                40
+            );
+
+            // was wir als nächstes Zeichnen wird grün
+            ctx.fillStyle = "rgb(0,255,0)";
+            // eun Rechteck in die Zeichenfläche malen
+            ctx.fillRect(
+                // X-Verschiebung in Pixeln
+                40,
+                // Y-Verschiebung in Pixeln
+                40,
+                // Breite in Pixeln
+                40,
+                // Höhe in Pxieln
+                40
+            );
+
+            // was wir als nächstes Zeichnen wird blau
+            ctx.fillStyle = "rgb(0,0,255)";
+            ctx.fillRect(
+                // X-Verschiebung in Pixeln
+                40,
+                // Y-Verschiebung in Pixeln
+                0,
+                // Breite in Pixeln
+                80,
+                // Höhe in Pxieln
+                40
+            );
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Zeichenfläche, in die wir mit Javascript zeichnen können. -->
+    <canvas id="spielfeld" width="400" height="400" style="display:block; margin: 0 auto; border: 1px solid #000"></canvas>
+</body>
+
+</html>

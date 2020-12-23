@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // Eine Funktion ist wie eine Abkürzung im Code.
+        // Sie ermöglicht uns zum Beispiel Code mehrfach zu verwenden
+        // oder unseren Code besser aufzuteilen.
+
+        // Eine Funktion kann mehrere Werte aufnehmen und sie verändern.
+        // Eine Funktion kann einen Wert zurück geben.
+
+        // Definieren Funktion "addieren", die die zwei Werte zahl_a und zahl_b
+        // annimmt. Sie gibt mit "return" einen Wert zurück. 
+        // Die Namen "zahl_a" und "zahl_b" sind nur in der Funktion gültig (siehe Beispiel).
+        function addieren(zahl_a, zahl_b) {
+            return zahl_a + zahl_b;
+        }
+
+        const zahl_1 = 5;
+        const zahl_2 = 2;
+        
+        let summe = addieren(zahl_1, zahl_2);
+        console.log(`summe=`, summe);
+
+        // das ist genau so wie
+        summe = zahl_1 + zahl_2;
+        console.log(`summe=`, summe);
+
+        // das ist auch okay
+        summe = addieren(1000, 14);
+        console.log(`summe=`, summe);
+
+
+        // #################################################################################
+
+        // Beispiel aus dem Snake Spiel:
+        // Funktion gibt ein Array von Arrays (Liste von Listen) zurück, über das ich
+        // jedes Feld (jede Spalte und jede Zeile) erreichen kann
+        function baueSpielfeld(hoehe, breite) {
+            let spielfeld = [];
+            for (let zeile = 0; zeile < hoehe; zeile = zeile + 1) {
+                // Sagen, dass jede Zeile wiederum eine Liste ist
+                spielfeld[zeile] = [];
+                for (let spalte = 0; spalte < breite; spalte = spalte + 1) {
+                    // ".push()": fügen der Liste dynamisch ein weiteres Element hinzu
+                    spielfeld[zeile].push(' ');
+                }
+            }
+            return spielfeld;
+        }
+        // bauen ein Spielfeld mit 10x10 Feldern
+        const spielfeld = baueSpielfeld(10, 10);
+        console.dir(spielfeld);
+    </script>
+</head>
+
+<body></body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // Hier erstellen wir das Spielfeld so wie auch im richtigen Spiel.
+        // Es gibt verschiedene Feldtypen (LEER,WAND,SPIELER) und eine
+        // Spielfeldbegrenzung.
+
+        // Die möglichen Arten, die ein Pixel auf dem Spielfeld darstellt.
+        const SpielfeldMarker = {
+            LEER: 0,
+            WAND: 1,
+            SPIELER: 2,
+        }
+        const HOEHE = 10;
+        const BREITE = 10;
+
+        const spielfeld = baueSpielfeld(HOEHE, BREITE);
+
+        // Grenzen einzeichnen
+        // ganz oben, ganz unten, ganz links und ganz rechts: Wand einzeichnen
+        for (let x = 0; x < BREITE; x++) {      
+            spielfeld[0][x] = SpielfeldMarker.WAND;
+            spielfeld[HOEHE - 1][x] = SpielfeldMarker.WAND;
+        }
+        for (let y = 0; y < HOEHE; y++) {      
+            spielfeld[y][0] = SpielfeldMarker.WAND;
+            spielfeld[y][BREITE - 1] = SpielfeldMarker.WAND;
+        }
+
+        // Plaziere Spieler
+        // Spieler ist zu beginn oben links 
+        // wir merken uns im gesamten Spiel die Position
+        let spielerPosition = {
+            x: 1, // Spalte des Spielerkopfes
+            y: 1, // Zeile des Spielerkopfes
+        }
+        // In das Spielfeld einzeichnen
+        spielfeld[spielerPosition.y][spielerPosition.x] = SpielfeldMarker.SPIELER;
+
+        
+        console.dir(spielfeld);
+
+
+        // Funktion gibt ein Array von Arrays (Liste von Listen) zurück, über das ich
+        // jedes Feld (jede Spalte und jede Zeile) erreichen kann
+        function baueSpielfeld(hoehe, breite) {
+            let spielfeld = [];
+            for (let zeile = 0; zeile < hoehe; zeile = zeile + 1) {
+                // Sagen, dass jede Zeile wiederum eine Liste ist
+                spielfeld[zeile] = [];
+                for (let spalte = 0; spalte < breite; spalte = spalte + 1) {
+                    // ".push()": fügen der Liste dynamisch ein weiteres Element hinzu
+                    spielfeld[zeile].push(SpielfeldMarker.LEER);
+                }
+            }
+            return spielfeld;
+        }
+
+    </script>
+</head>
+
+<body></body>
+</html>

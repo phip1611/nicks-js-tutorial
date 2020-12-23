@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // Eine Schleife benutzen wir um eine Aktion mehrere Male zu wiederholen.
+
+        // Die typischste Schleife ist die "for"-Schleife.
+        // Sie besteht aus drei Komponenten:
+        // "let i = 0" - die Zählvariable
+        // "i < 10"    - die Bedingung: so lange sie wahr ist, wird die Schleife ein weiteres Mal ausgeführt
+        // "i = i + 1" - Veränderung der Zählvariable bei jeder Iteration.
+        for (let i = 0; i < 10; i = i + 1) {
+            // TODO Wiederholung nennen
+            console.log(`Wiederholung: ${i}`);
+        }
+
+        // Warum brauchen wir daS?
+        // Angenommen wir haben ein Spielfeld mit 10x10 Feldern und wir wollen
+        // eine Variable generieren, die das Spielfeld hält. Dann können wir 
+        // das wie folgt machen:
+
+        // 10x10 Spielfeld
+        const ZEILEN = 10;
+        const SPALTEN = 10;
+
+        // In einem 10x10 Spielfeld wollen wir jedes Feld einzeln ansprechen.
+        // Also bauen wir uns ein Array von Arrays (eine Liste von Listen) auf.
+        // Die äußere Liste hält die 10 Zeilen. In jeder Zeile gibt es ein Array
+        // für die
+        let spielfeld = [];
+        for (let zeile = 0; zeile < ZEILEN; zeile = zeile + 1) {
+            // Sagen, dass jede Zeile wiederum eine Liste ist
+            spielfeld[zeile] = [];
+            for (let spalte = 0; spalte < SPALTEN; spalte = spalte + 1) {
+                // ".push()": fügen der Liste dynamisch ein weiteres Element hinzu
+                spielfeld[zeile].push(' ');
+            }
+        }
+
+        // Wir positionieren den Spieler einmal oben links
+        spielfeld[0][0] = 'X'; 
+
+        // und eine Münze die wir einsammeln wollen
+        // links in der Mitte
+        spielfeld[5][0] = 'C';
+
+        console.dir(spielfeld);
+    </script>
+</head>
+
+<body></body>
+</html>

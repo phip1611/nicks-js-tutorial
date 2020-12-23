@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+    <script>
+        // "number": ganze Zahl
+        const zahl = 5;
+        // "number": gebrochene Zahl
+        const gebrochene_zahl = 24.12415;
+        // "String"/text
+        const name = "Nick";
+
+        // Arrays/Listen. Eine Variable, die mehrere Werte in Form einer Liste beinhaltet. 
+        const liste = [1, 2, 3];
+        // geben die Variable auf die Browserkonsole aus
+        console.log("liste:", liste);
+
+        // Du kannst auch ein Array von Strings benutzen
+        const sportarten = [
+            "Fußball",
+            "Völkerball",
+            "Handball"
+        ];
+        console.log("sportarten:", sportarten);
+
+        // um auf die Werte in einem Array zuzugreifen benutzen wir einen Index
+        // die Zählung beginnt immer bei 0
+        console.log("1. Sportart:", sportarten[0]);
+        console.log("2. Sportart:", sportarten[1]);
+        console.log("3. Sportart:", sportarten[2]);
+
+        // Objekte
+        // Objekte brauchen wir im Spiel zum Beispiel um die Position
+        // des Spielers zu speichern. Jeder Spieler hat eine X und eine Y-Koordinate.
+
+        // Die Notation mit {}-Klammern bedeutet, dass wir ein "Objekt"
+        // haben. Ein Objekt hat mehrere Felder, die:
+        // - eine Zahl sein können
+        // - ein String (Zeichenkette)
+        // - ein Array
+        // - ein weiteres Objekt 
+        const person = {
+            alter: 10,
+            name: "Nick",
+            // wir weisen "lieblingssport" die erste Sportart zu
+            lieblingssport: sportarten[0],
+        }
+        console.log("person:", person);
+        // Zugriff auf Eigenschaften/Felders des Objektes über .-Notation
+        // z.B. ".alter"
+        console.log("person.alter", person.alter);
+    </script>
+</head>
+
+<body></body>
+</html>
