@@ -30,6 +30,7 @@
         summe = addieren(1000, 14);
         console.log(`summe=`, summe);
 
+        console.log('####################################################');
         // #################################################################################
 
         // Beispiel aus dem Snake Spiel:
@@ -53,7 +54,9 @@
         console.log("Spielfeld:");
         console.dir(spielfeld);
 
+        console.log('####################################################');
         // #################################################################################
+        
         // function addieren(zahl_a, zahl_b) {
         // zahl_a, zahl_b: Werden auch "Argumente" oder "Parameter" der Funktion genannt
 
@@ -69,6 +72,20 @@
         // gespeichert.
         const produkt = multiplizierungsFunktion(7, 8);
         console.log(`produkt=`, produkt);
+
+        console.log('####################################################');
+        // #################################################################################
+        // Funktionen können Variablen verändern; sie müssen nicht immer
+        // Werte zurück geben.
+        let zaehler = 0;
+        console.log(`zaehler=${zaehler}`);
+        function zaehle_eins_hoch() {
+            zaehler = zaehler + 1;
+        }
+        zaehle_eins_hoch()
+        zaehle_eins_hoch()
+        zaehle_eins_hoch()
+        console.log(`zaehler=${zaehler}`);
     </script>
 </head>
 
